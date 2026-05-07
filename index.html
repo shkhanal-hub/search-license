@@ -11,15 +11,17 @@
         
         h2 { color: #1b5e20; margin-bottom: 1.5rem; font-size: 1.6rem; font-weight: bold; line-height: 1.4; }
         
-        input { width: 100%; padding: 12px; margin-bottom: 1rem; border: 2px solid #e0e0e0; border-radius: 8px; box-sizing: border-box; font-size: 1.1rem; outline: none; transition: border-color 0.3s; text-align: center; color: #000; }
+        input { width: 100%; padding: 12px; margin-bottom: 5px; border: 2px solid #e0e0e0; border-radius: 8px; box-sizing: border-box; font-size: 1.1rem; outline: none; transition: border-color 0.3s; text-align: center; color: #000; }
         input:focus { border-color: #1b5e20; }
         
-        button { width: 100%; background-color: #d32f2f; color: white; padding: 12px; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: background 0.3s; }
+        /* खाली हुँदा देखाउने सन्देशको स्टाइल */
+        #emptyError { color: #d32f2f; font-size: 0.9rem; margin-bottom: 10px; display: none; font-weight: bold; }
+        
+        button { width: 100%; background-color: #d32f2f; color: white; padding: 12px; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: background 0.3s; margin-top: 5px; }
         button:hover { background-color: #b71c1c; }
         
         #result { margin-top: 1.5rem; padding: 1.2rem; border-radius: 8px; background: #f8f9fa; display: none; border-left: 5px solid #1b5e20; }
         .res-item { margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px; text-align: left; }
-        .res-item:last-child { border-bottom: none; }
         .res-label { font-size: 0.85rem; color: #70757a; font-weight: bold; margin-bottom: 3px; }
         .res-value { font-size: 1.1rem; color: #202124; }
         
@@ -36,6 +38,8 @@
     <h2>कार्यालयमा प्राप्त मध्ये तपाईंको लाइसेन्स खोजी</h2>
     
     <input type="text" id="licenseInput" placeholder="लाइसेन्स नम्बर (उदा: 01-06-00307225)">
+    <div id="emptyError">कृपया लाइसेन्स नम्बर भर्नुहोस् !</div>
+    
     <button onclick="searchLicense()">कार्यालयको लिष्टमा खोज्नुहोस्</button>
 
     <div id="result"></div>
@@ -50,13 +54,19 @@
     async function searchLicense() {
         const rawInput = document.getElementById('licenseInput').value.trim();
         const resDiv = document.getElementById('result');
+        const emptyError = document.getElementById('emptyError');
         
+        // यदि इनपुट खाली छ भने पपअपको सट्टा रातो अक्षर देखाउने
         if (!rawInput) {
-            alert("कृपया लाइसेन्स नम्बर भर्नुहोस् ।");
+            emptyError.style.display = 'block';
+            resDiv.style.display = 'none';
+            document.getElementById('licenseInput').style.borderColor = '#d32f2f';
             return;
+        } else {
+            emptyError.style.display = 'none';
+            document.getElementById('licenseInput').style.borderColor = '#e0e0e0';
         }
 
-        // Exact Match को लागि नम्बर फर्म्याट मिलाउने
         const cleanInput = rawInput.replace(/-/g, '');
         let formattedInput = rawInput;
 
@@ -72,7 +82,6 @@
 
         if (error) {
             console.error(error);
-            alert("डाटाबेसमा समस्या देखियो।");
             return;
         }
 
@@ -100,15 +109,20 @@
                 </div>`;
             resDiv.style.borderLeftColor = "#1b5e20";
         } else {
-            // तपाईंले भन्नुभएको पहिलेकै विस्तृत मेसेज
             resDiv.innerHTML = `
                 <p class="error-msg">
                     तपाईंले खोज्नुभएको <strong>${rawInput}</strong> नम्बरको लाइसेन्स कार्यालयमा प्राप्त भएको भेटिएन ।<br>
-                    <span class="error-sub">कृपया नम्बर पुन: जाँच गर्नुहोला वा कार्यालयमा अर्को लट प्राप्त भएको सूचना प्राप्त भए पश्चात् पुनः खोजी गर्नुहोला ।</span>
+                    <span class="error-sub">कृपया नम्बर पुन: जाँच गर्नुहोला वा नयाँ सूचना कुर्नुहोला ।</span>
                 </p>`;
             resDiv.style.borderLeftColor = "#d32f2f";
         }
     }
+
+    // टाइप गर्न थालेपछि रातो सन्देश हराउने बनाउन
+    document.getElementById("licenseInput").addEventListener("input", function() {
+        document.getElementById('emptyError').style.display = 'none';
+        this.style.borderColor = '#1b5e20';
+    });
 
     document.getElementById("licenseInput").addEventListener("keypress", (e) => {
         if (e.key === "Enter") searchLicense();
