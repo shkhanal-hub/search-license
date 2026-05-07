@@ -35,9 +35,9 @@
 <body>
 
 <div class="card">
-    <h2>कार्यालयको लिष्टमा लाइसेन्स खोजी</h2>
+    <h2>कार्यालयमा प्राप्त मध्ये तपाईको लाइसेन्स खोजी</h2>
     
-    <input type="text" id="licenseInput" placeholder="लाइसेन्स नम्बर राख्नुहोस् (Ex: 01-06-...)">
+    <input type="text" id="licenseInput" placeholder="लाइसेन्स नम्बर राख्नुहोस् (Ex: 03-06-...)">
     <button onclick="searchLicense()">कार्यालयको लिष्टमा खोज्नुहोस्</button>
 
     <div id="result">
@@ -99,8 +99,8 @@
         } else {
             resDiv.style.display = 'block';
             resDiv.innerHTML = `<p style='color:#d32f2f; margin:0; text-align:center; font-weight:bold;'>
-                तपाईले खोज्नुभएको नम्बर <strong>${input}</strong> को रेकर्ड भेटिएन ।<br>
-                <small style="color: #555;">कृपया नम्बर पुन: जाँच गर्नुहोला ।</small></p>`;
+                तपाईले खोज्नुभएको  <strong>${input}</strong> नम्बरको लाइसेन्स कार्यालयमा प्राप्त भएको भेटिएन ।<br>
+                <small style="color: #555;">कृपया नम्बर पुन: जाँच गर्नुहोला वा कार्यालयमा अर्को लट प्राप्त भएको सूचना प्राप्त भए पश्चात् पुनः खोजी गर्नुहोला ।</small></p>`;
             resDiv.style.borderLeftColor = "#d32f2f";
         }
     }
