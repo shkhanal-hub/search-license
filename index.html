@@ -6,73 +6,28 @@
     <title>लाइसेन्स खोजी | यातायात व्यवस्था कार्यालय कलंकी</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { 
-            font-family: 'Segoe UI', Arial, sans-serif; 
-            background-color: #f0f2f5; 
-            display: flex; 
-            justify-content: center; 
-            align-items: flex-start; /* माथि पट्टि राख्न */
-            margin: 0; 
-            padding-top: 30px; /* माथिबाट थोरै ग्याप */
-        }
-        .card { 
-            background: white; 
-            padding: 2rem; 
-            border-radius: 12px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
-            width: 95%; 
-            max-width: 450px; 
-            text-align: center; 
-        }
-        
-        h2 { color: #1b5e20; margin-bottom: 1.5rem; font-size: 1.5rem; font-weight: bold; line-height: 1.4; }
-        
-        input { 
-            width: 100%; 
-            padding: 12px; 
-            margin-bottom: 1rem; 
-            border: 2px solid #e0e0e0; 
-            border-radius: 8px; 
-            box-sizing: border-box; 
-            font-size: 1.1rem; 
-            outline: none; 
-            text-align: center; 
-            color: #000;
-        }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: flex-start; margin: 0; padding-top: 20px; }
+        .card { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); width: 95%; max-width: 420px; text-align: center; }
+        h2 { color: #1b5e20; margin-bottom: 1.2rem; font-size: 1.4rem; font-weight: bold; }
+        input { width: 100%; padding: 12px; margin-bottom: 1rem; border: 2px solid #e0e0e0; border-radius: 8px; box-sizing: border-box; font-size: 1.1rem; text-align: center; outline: none; }
         input:focus { border-color: #1b5e20; }
-        
-        button { 
-            width: 100%; 
-            background-color: #d32f2f; 
-            color: white; 
-            padding: 12px; 
-            border: none; 
-            border-radius: 8px; 
-            font-size: 1.1rem; 
-            font-weight: bold; 
-            cursor: pointer; 
-        }
+        button { width: 100%; background-color: #d32f2f; color: white; padding: 12px; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
         button:hover { background-color: #b71c1c; }
-        
-        #result { margin-top: 1.5rem; padding: 1.2rem; border-radius: 8px; background: #f8f9fa; display: none; border-left: 5px solid #1b5e20; }
-        .res-item { margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px; text-align: left; }
-        .res-label { font-size: 0.85rem; color: #70757a; font-weight: bold; margin-bottom: 3px; }
-        .res-value { font-size: 1.1rem; color: #202124; }
-        
-        .box-container { background-color: #e8f5e9; padding: 15px; border-radius: 10px; border: 2px solid #2e7d32; text-align: center; margin-top: 10px; }
-        .box-highlight { color: #1b5e20; font-weight: bold; font-size: 2.5rem; display: block; margin-top: 5px; }
-        
-        .error-msg { color: #d32f2f; margin: 0; text-align: center; font-weight: bold; }
+        #result { margin-top: 1.2rem; padding: 1rem; border-radius: 8px; background: #f8f9fa; display: none; border-left: 5px solid #1b5e20; text-align: left; }
+        .res-item { margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .res-label { font-size: 0.8rem; color: #70757a; font-weight: bold; }
+        .res-value { font-size: 1rem; color: #202124; font-weight: 500; }
+        .box-container { background-color: #e8f5e9; padding: 12px; border-radius: 10px; border: 2px solid #2e7d32; text-align: center; margin-top: 8px; }
+        .box-highlight { color: #1b5e20; font-weight: bold; font-size: 2.2rem; display: block; }
+        .error-msg { color: #d32f2f; text-align: center; font-weight: bold; margin: 0; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>तपाईंको स्मार्ट कार्ड (लाइसेन्स) खोजी</h2>
-    
-    <input type="text" id="licenseInput" placeholder="लाइसेन्स नम्बर (उदा: 03-06-...)">
+    <h2>स्मार्ट कार्ड (लाइसेन्स) खोजी</h2>
+    <input type="text" id="licenseInput" placeholder="लाइसेन्स नम्बर (उदा: 01-06-00307225)">
     <button onclick="searchLicense()">यहाँ खोज्नुहोस्</button>
-
     <div id="result"></div>
 </div>
 
@@ -90,56 +45,45 @@
             return;
         }
 
+        // १. प्रयोगकर्ताले हानेको नम्बरबाट ड्यास हटाउने (सफा गर्ने)
         const cleanInput = rawInput.replace(/-/g, '');
-        const flexibleSearch = `%${cleanInput.split('').join('%')}%`;
 
+        // २. ड्यास हटाउँदा १२ अंकको हुनुपर्छ (नेपाली लाइसेन्स फर्म्याट अनुसार)
+        // यदि डेटाबेसमा 01-06-XXXXXXXX छ भने, त्यसलाई मिलाउन यस्तो लजिक राखिएको छ:
+        let formattedInput;
+        if (cleanInput.length === 12) {
+            // 010600307225 लाई 01-06-00307225 बनाउने
+            formattedInput = cleanInput.substring(0,2) + '-' + cleanInput.substring(2,4) + '-' + cleanInput.substring(4);
+        } else {
+            formattedInput = rawInput; // नमिलेमा जस्तो छ त्यस्तै खोज्ने
+        }
+
+        // ३. सुपबेसमा Exact Match खोजी गर्ने
         const { data, error } = await supabaseClient
             .from('licenses')
             .select('"License Number", "License Holder Name", "Box Code", "License Office"')
-            .ilike('License Number', flexibleSearch)
+            .eq('License Number', formattedInput) // यहाँ 'eq' प्रयोग गरिएको छ (Exact Match)
             .maybeSingle();
-
-        if (error) {
-            console.error(error);
-            alert("डाटाबेस कनेक्सनमा समस्या भयो ।");
-            return;
-        }
 
         resDiv.style.display = 'block';
 
         if (data) {
             resDiv.innerHTML = `
-                <div class="res-item">
-                    <div class="res-label">लाइसेन्स नम्बर:</div>
-                    <div class="res-value" style="font-weight: bold;">${data["License Number"]}</div>
-                </div>
-                <div class="res-item">
-                    <div class="res-label">धारकको नाम:</div>
-                    <div class="res-value">${data["License Holder Name"]}</div>
-                </div>
-                <div class="res-item">
-                    <div class="res-label">कार्यालय:</div>
-                    <div class="res-value">${data["License Office"] || "ठूलोभर्‍याङ, कलंकी"}</div>
-                </div>
-                <div class="res-item" style="border-bottom: none;">
-                    <div class="box-container">
-                        <div class="res-label" style="color: #2e7d32; font-size: 1rem;">लाइसेन्स रहेको बक्स कोड:</div>
-                        <div class="box-highlight">${data["Box Code"]}</div>
-                    </div>
+                <div class="res-item"><div class="res-label">लाइसेन्स नम्बर:</div><div class="res-value">${data["License Number"]}</div></div>
+                <div class="res-item"><div class="res-label">धारकको नाम:</div><div class="res-value">${data["License Holder Name"]}</div></div>
+                <div class="res-item"><div class="res-label">कार्यालय:</div><div class="res-value">${data["License Office"] || "ठूलोभर्‍याङ, कलंकी"}</div></div>
+                <div class="box-container">
+                    <div class="res-label" style="color: #2e7d32;">लाइसेन्स रहेको बक्स कोड:</div>
+                    <span class="box-highlight">${data["Box Code"]}</span>
                 </div>`;
             resDiv.style.borderLeftColor = "#1b5e20";
         } else {
-            resDiv.innerHTML = `
-                <p class="error-msg">
-                    <strong>${rawInput}</strong> नम्बरको लाइसेन्स कार्यालयमा प्राप्त भएको भेटिएन ।
-                </p>`;
+            resDiv.innerHTML = `<p class="error-msg">नम्बर मिलेन वा लाइसेन्स प्राप्त भएको छैन।</p>`;
             resDiv.style.borderLeftColor = "#d32f2f";
         }
     }
 
-    document.getElementById("licenseInput").addEventListener("keypress", function(e) {
-        if (e.key === "Enter") searchLicense();
-    });
+    document.getElementById("licenseInput").addEventListener("keypress", (e) => { if (e.key === "Enter") searchLicense(); });
 </script>
 
 </body>
