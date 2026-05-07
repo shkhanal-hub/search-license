@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>लाइसेन्स खोजी</title>
-    <!-- Supabase Library -->
+    <title>लाइसेन्स खोजी | यातायात व्यवस्था कार्यालय कलंकी</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
         .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 90%; max-width: 450px; text-align: center; }
         
         /* शीर्षक गाढा हरियो */
-        h2 { color: #1b5e20; margin-bottom: 1.5rem; font-size: 1.6rem; font-weight: bold; }
+        h2 { color: #1b5e20; margin-bottom: 1.5rem; font-size: 1.6rem; font-weight: bold; line-height: 1.4; }
         
-        input { width: 100%; padding: 12px; margin-bottom: 1rem; border: 2px solid #e0e0e0; border-radius: 8px; box-sizing: border-box; font-size: 1rem; outline: none; transition: border-color 0.3s; text-align: center; }
+        input { width: 100%; padding: 12px; margin-bottom: 1rem; border: 2px solid #e0e0e0; border-radius: 8px; box-sizing: border-box; font-size: 1.1rem; outline: none; transition: border-color 0.3s; text-align: center; color: #000; }
         input:focus { border-color: #1b5e20; }
         
         /* बटन रातो */
@@ -30,36 +29,21 @@
         /* बक्स कोडको बक्स हरियो रङ्गमा */
         .box-container { background-color: #e8f5e9; padding: 15px; border-radius: 10px; border: 2px solid #2e7d32; text-align: center; margin-top: 10px; }
         .box-highlight { color: #1b5e20; font-weight: bold; font-size: 2.5rem; display: block; margin-top: 5px; }
+        
+        .error-msg { color: #d32f2f; margin: 0; text-align: center; font-weight: bold; }
+        .error-sub { color: #555; font-size: 0.9rem; font-weight: normal; display: block; margin-top: 5px; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>कार्यालयमा प्राप्त मध्ये तपाईको लाइसेन्स खोजी</h2>
+    <h2>कार्यालयमा प्राप्त मध्ये तपाईंको लाइसेन्स खोजी</h2>
     
-    <input type="text" id="licenseInput" placeholder="लाइसेन्स नम्बर राख्नुहोस् (Ex: 03-06-...)">
+    <input type="text" id="licenseInput" placeholder="लाइसेन्स नम्बर (उदा: 03-06-...)">
     <button onclick="searchLicense()">कार्यालयको लिष्टमा खोज्नुहोस्</button>
 
     <div id="result">
-        <div class="res-item">
-            <div class="res-label">लाइसेन्स नम्बर:</div>
-            <div id="resNum" class="res-value" style="font-weight: bold;"></div>
         </div>
-        <div class="res-item">
-            <div class="res-label">धारकको नाम:</div>
-            <div id="resName" class="res-value"></div>
-        </div>
-        <div class="res-item">
-            <div class="res-label">कार्यालय:</div>
-            <div id="resOffice" class="res-value"></div>
-        </div>
-        <div class="res-item" style="border-bottom: none;">
-            <div class="box-container">
-                <div class="res-label" style="color: #2e7d32; font-size: 1rem;">तपाईको लाईसेन्स रहेको बक्स कोड:</div>
-                <div id="resBox" class="box-highlight"></div>
-            </div>
-        </div>
-    </div>
 </div>
 
 <script>
@@ -69,18 +53,24 @@
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     async function searchLicense() {
-        const input = document.getElementById('licenseInput').value.trim();
+        const rawInput = document.getElementById('licenseInput').value.trim();
         const resDiv = document.getElementById('result');
         
-        if (!input) {
+        if (!rawInput) {
             alert("कृपया लाइसेन्स नम्बर भर्नुहोस् ।");
             return;
         }
 
+        // ड्यास हटाएर नम्बर मात्र बनाउने
+        const cleanInput = rawInput.replace(/-/g, '');
+        
+        // नम्बरका बीचमा % राखेर लचिलो खोजी गर्ने ढाँचा बनाउने
+        const flexibleSearch = `%${cleanInput.split('').join('%')}%`;
+
         const { data, error } = await supabaseClient
             .from('licenses')
             .select('"License Number", "License Holder Name", "Box Code", "License Office"')
-            .ilike('License Number', `%${input}%`)
+            .ilike('License Number', flexibleSearch)
             .maybeSingle();
 
         if (error) {
@@ -89,21 +79,48 @@
             return;
         }
 
+        resDiv.style.display = 'block';
+
         if (data) {
-            resDiv.style.display = 'block';
-            document.getElementById('resNum').innerText = data["License Number"];
-            document.getElementById('resName').innerText = data["License Holder Name"];
-            document.getElementById('resOffice').innerText = data["License Office"] || "ठूलोभर्‍याङ, कलंकी";
-            document.getElementById('resBox').innerText = data["Box Code"];
+            // डेटा फेला परेमा देखाउने ढाँचा
+            resDiv.innerHTML = `
+                <div class="res-item">
+                    <div class="res-label">लाइसेन्स नम्बर:</div>
+                    <div class="res-value" style="font-weight: bold;">${data["License Number"]}</div>
+                </div>
+                <div class="res-item">
+                    <div class="res-label">धारकको नाम:</div>
+                    <div class="res-value">${data["License Holder Name"]}</div>
+                </div>
+                <div class="res-item">
+                    <div class="res-label">कार्यालय:</div>
+                    <div class="res-value">${data["License Office"] || "ठूलोभर्‍याङ, कलंकी"}</div>
+                </div>
+                <div class="res-item" style="border-bottom: none;">
+                    <div class="box-container">
+                        <div class="res-label" style="color: #2e7d32; font-size: 1rem;">तपाईंको लाइसेन्स रहेको बक्स कोड:</div>
+                        <div class="box-highlight">${data["Box Code"]}</div>
+                    </div>
+                </div>
+            `;
             resDiv.style.borderLeftColor = "#1b5e20";
         } else {
-            resDiv.style.display = 'block';
-            resDiv.innerHTML = `<p style='color:#d32f2f; margin:0; text-align:center; font-weight:bold;'>
-                तपाईले खोज्नुभएको  <strong>${input}</strong> नम्बरको लाइसेन्स कार्यालयमा प्राप्त भएको भेटिएन ।<br>
-                <small style="color: #555;">कृपया नम्बर पुन: जाँच गर्नुहोला वा कार्यालयमा अर्को लट प्राप्त भएको सूचना प्राप्त भए पश्चात् पुनः खोजी गर्नुहोला ।</small></p>`;
+            // डेटा फेला नपरेमा देखाउने ढाँचा
+            resDiv.innerHTML = `
+                <p class="error-msg">
+                    तपाईंले खोज्नुभएको <strong>${rawInput}</strong> नम्बरको लाइसेन्स कार्यालयमा प्राप्त भएको भेटिएन ।
+                    <span class="error-sub">कृपया नम्बर पुन: जाँच गर्नुहोला वा नयाँ सूचना प्राप्त भए पश्चात् पुनः खोजी गर्नुहोला ।</span>
+                </p>`;
             resDiv.style.borderLeftColor = "#d32f2f";
         }
     }
+
+    // Enter Key थिच्दा पनि सर्च हुने बनाउन
+    document.getElementById("licenseInput").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            searchLicense();
+        }
+    });
 </script>
 
 </body>
