@@ -6,50 +6,79 @@
     <title>लाइसेन्स खोजी | यातायात व्यवस्था कार्यालय कलंकी</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 90%; max-width: 450px; text-align: center; }
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background-color: #f0f2f5; 
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-start; /* माथि पट्टि राख्न */
+            margin: 0; 
+            padding-top: 30px; /* माथिबाट थोरै ग्याप */
+        }
+        .card { 
+            background: white; 
+            padding: 2rem; 
+            border-radius: 12px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+            width: 95%; 
+            max-width: 450px; 
+            text-align: center; 
+        }
         
-        /* शीर्षक गाढा हरियो */
-        h2 { color: #1b5e20; margin-bottom: 1.5rem; font-size: 1.6rem; font-weight: bold; line-height: 1.4; }
+        h2 { color: #1b5e20; margin-bottom: 1.5rem; font-size: 1.5rem; font-weight: bold; line-height: 1.4; }
         
-        input { width: 100%; padding: 12px; margin-bottom: 1rem; border: 2px solid #e0e0e0; border-radius: 8px; box-sizing: border-box; font-size: 1.1rem; outline: none; transition: border-color 0.3s; text-align: center; color: #000; }
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            margin-bottom: 1rem; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 8px; 
+            box-sizing: border-box; 
+            font-size: 1.1rem; 
+            outline: none; 
+            text-align: center; 
+            color: #000;
+        }
         input:focus { border-color: #1b5e20; }
         
-        /* बटन रातो */
-        button { width: 100%; background-color: #d32f2f; color: white; padding: 12px; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: background 0.3s; }
+        button { 
+            width: 100%; 
+            background-color: #d32f2f; 
+            color: white; 
+            padding: 12px; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 1.1rem; 
+            font-weight: bold; 
+            cursor: pointer; 
+        }
         button:hover { background-color: #b71c1c; }
         
-        /* Result Styling */
         #result { margin-top: 1.5rem; padding: 1.2rem; border-radius: 8px; background: #f8f9fa; display: none; border-left: 5px solid #1b5e20; }
         .res-item { margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px; text-align: left; }
-        .res-item:last-child { border-bottom: none; }
         .res-label { font-size: 0.85rem; color: #70757a; font-weight: bold; margin-bottom: 3px; }
         .res-value { font-size: 1.1rem; color: #202124; }
         
-        /* बक्स कोडको बक्स हरियो रङ्गमा */
         .box-container { background-color: #e8f5e9; padding: 15px; border-radius: 10px; border: 2px solid #2e7d32; text-align: center; margin-top: 10px; }
         .box-highlight { color: #1b5e20; font-weight: bold; font-size: 2.5rem; display: block; margin-top: 5px; }
         
         .error-msg { color: #d32f2f; margin: 0; text-align: center; font-weight: bold; }
-        .error-sub { color: #555; font-size: 0.9rem; font-weight: normal; display: block; margin-top: 5px; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>कार्यालयमा प्राप्त मध्ये तपाईंको लाइसेन्स खोजी</h2>
+    <h2>तपाईंको स्मार्ट कार्ड (लाइसेन्स) खोजी</h2>
     
     <input type="text" id="licenseInput" placeholder="लाइसेन्स नम्बर (उदा: 03-06-...)">
-    <button onclick="searchLicense()">कार्यालयको लिष्टमा खोज्नुहोस्</button>
+    <button onclick="searchLicense()">यहाँ खोज्नुहोस्</button>
 
-    <div id="result">
-        </div>
+    <div id="result"></div>
 </div>
 
 <script>
     const SUPABASE_URL = 'https://bjnpdbfnzzfuwqsarldo.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbnBkYmZuenpmdXdxc2FybGRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwNzI4MzMsImV4cCI6MjA5MzY0ODgzM30.obSe6i4D3XzkcvzjkLb5K1QPbJO6X2mH_KqVvlupuvw';
-    
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     async function searchLicense() {
@@ -61,10 +90,7 @@
             return;
         }
 
-        // ड्यास हटाएर नम्बर मात्र बनाउने
         const cleanInput = rawInput.replace(/-/g, '');
-        
-        // नम्बरका बीचमा % राखेर लचिलो खोजी गर्ने ढाँचा बनाउने
         const flexibleSearch = `%${cleanInput.split('').join('%')}%`;
 
         const { data, error } = await supabaseClient
@@ -74,15 +100,14 @@
             .maybeSingle();
 
         if (error) {
-            console.error("Database Error:", error);
-            alert("डाटाबेसमा समस्या देखियो: " + error.message);
+            console.error(error);
+            alert("डाटाबेस कनेक्सनमा समस्या भयो ।");
             return;
         }
 
         resDiv.style.display = 'block';
 
         if (data) {
-            // डेटा फेला परेमा देखाउने ढाँचा
             resDiv.innerHTML = `
                 <div class="res-item">
                     <div class="res-label">लाइसेन्स नम्बर:</div>
@@ -98,28 +123,22 @@
                 </div>
                 <div class="res-item" style="border-bottom: none;">
                     <div class="box-container">
-                        <div class="res-label" style="color: #2e7d32; font-size: 1rem;">तपाईंको लाइसेन्स रहेको बक्स कोड:</div>
+                        <div class="res-label" style="color: #2e7d32; font-size: 1rem;">लाइसेन्स रहेको बक्स कोड:</div>
                         <div class="box-highlight">${data["Box Code"]}</div>
                     </div>
-                </div>
-            `;
+                </div>`;
             resDiv.style.borderLeftColor = "#1b5e20";
         } else {
-            // डेटा फेला नपरेमा देखाउने ढाँचा
             resDiv.innerHTML = `
                 <p class="error-msg">
-                    तपाईंले खोज्नुभएको <strong>${rawInput}</strong> नम्बरको लाइसेन्स कार्यालयमा प्राप्त भएको भेटिएन ।
-                    <span class="error-sub">कृपया नम्बर पुन: जाँच गर्नुहोला वा नयाँ सूचना प्राप्त भए पश्चात् पुनः खोजी गर्नुहोला ।</span>
+                    <strong>${rawInput}</strong> नम्बरको लाइसेन्स कार्यालयमा प्राप्त भएको भेटिएन ।
                 </p>`;
             resDiv.style.borderLeftColor = "#d32f2f";
         }
     }
 
-    // Enter Key थिच्दा पनि सर्च हुने बनाउन
-    document.getElementById("licenseInput").addEventListener("keypress", function(event) {
-        if (event.key === "Enter") {
-            searchLicense();
-        }
+    document.getElementById("licenseInput").addEventListener("keypress", function(e) {
+        if (e.key === "Enter") searchLicense();
     });
 </script>
 
