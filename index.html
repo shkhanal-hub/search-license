@@ -7,23 +7,36 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root { --primary: #1e40af; --bg: #f8fafc; --success: #16a34a; --error: #dc2626; }
+        /* --primary लाई रातो (#d32f2f) बनाइएको छ */
+        :root { --primary: #d32f2f; --bg: #f8fafc; --success: #16a34a; --error: #dc2626; }
+        
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); margin: 0; padding: 15px; display: flex; justify-content: center; }
         .container { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: center; }
-        h2 { color: var(--primary); margin: 15px 0 5px 0; font-size: 1.4rem; }
-        .info-text { font-size: 0.9rem; color: #475569; background: #eff6ff; padding: 10px; border-radius: 8px; margin-bottom: 20px; line-height: 1.5; border-left: 4px solid var(--primary); }
+        
+        /* शीर्षकको रङ कालो/गाढा राखिएको छ ताकि लोगो र बटनसँग राम्रो देखियोस् */
+        h2 { color: #333; margin: 15px 0 5px 0; font-size: 1.4rem; font-weight: bold; }
+        
+        /* सूचना बक्सलाई हल्का रातो थिम दिइएको छ */
+        .info-text { font-size: 0.85rem; color: #475569; background: #fff1f1; padding: 10px; border-radius: 8px; margin-bottom: 20px; line-height: 1.5; border-left: 4px solid var(--primary); text-align: left; }
+        
         .input-group { margin-bottom: 1rem; }
         input { width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; box-sizing: border-box; outline: none; }
         input:focus { border-color: var(--primary); }
-        button { background: var(--primary); color: white; border: none; padding: 14px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; width: 100%; font-weight: bold; }
-        button:disabled { background: #94a3b8; }
+        
+        /* बटन स्टाइल */
+        button { background: var(--primary); color: white; border: none; padding: 14px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; width: 100%; font-weight: bold; transition: background 0.3s; }
+        button:hover { background: #b71c1c; }
+        button:disabled { background: #ef9a9a; }
+        
         #loader { display: none; margin: 20px 0; color: var(--primary); font-weight: bold; }
         .result-card { margin-top: 20px; padding: 15px; border-radius: 10px; text-align: left; display: none; }
         .success { background: #f0fdf4; border: 1px solid var(--success); }
         .error { background: #fef2f2; border: 1px solid var(--error); }
         .label { font-weight: bold; color: #64748b; font-size: 0.8rem; margin-bottom: 2px; }
         .value { color: #1e293b; margin-bottom: 12px; font-size: 1.05rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; }
-        .box-highlight { background: var(--primary); color: white; padding: 10px; border-radius: 6px; margin-top: 10px; text-align: center; font-size: 1.1rem; }
+        
+        /* बाकस कोडको रङ नीलो नै राखिएको छ ताकि यो प्रस्ट छुट्टियोस् */
+        .box-highlight { background: #1e40af; color: white; padding: 10px; border-radius: 6px; margin-top: 10px; text-align: center; font-size: 1.1rem; }
     </style>
 </head>
 <body>
