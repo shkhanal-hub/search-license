@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>लाइसेन्स खोज्नुहोस् | यातायात व्यवस्था कार्यालय, कलंकी</title>
+    <title>स्मार्ट लाइसेन्स खोज्नुहोस् | यातायात कार्यालय</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -11,18 +11,15 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); margin: 0; padding: 20px; display: flex; justify-content: center; }
         .container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: center; }
         h2 { color: var(--primary); margin-bottom: 1.5rem; }
-        .input-group { margin-bottom: 1rem; position: relative; }
-        input { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; box-sizing: border-box; outline: none; transition: border 0.3s; }
-        input:focus { border-color: var(--primary); }
-        button { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; width: 100%; transition: opacity 0.3s; }
-        button:hover { opacity: 0.9; }
+        .input-group { margin-bottom: 1rem; }
+        input { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; box-sizing: border-box; outline: none; }
+        button { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; width: 100%; }
         #loader { display: none; margin: 20px 0; color: var(--primary); }
-        .result-card { margin-top: 20px; padding: 15px; border-radius: 8px; text-align: left; display: none; animation: fadeIn 0.5s; }
+        .result-card { margin-top: 20px; padding: 15px; border-radius: 8px; text-align: left; display: none; }
         .success { background: #dcfce7; border: 1px solid #16a34a; }
         .error { background: #fee2e2; border: 1px solid #dc2626; }
         .label { font-weight: bold; color: #475569; font-size: 0.9rem; }
         .value { color: #1e293b; margin-bottom: 8px; font-size: 1.1rem; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -30,91 +27,77 @@
 <div class="container">
     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Emblem_of_Nepal.svg/100px-Emblem_of_Nepal.svg.png" alt="Nepal Logo" width="60">
     <h2>स्मार्ट लाइसेन्स खोज्नुहोस्</h2>
-    <p style="font-size: 0.9rem; color: #64748b;">तपाईंको लाइसेन्स नम्बर बाकसमा राख्नुहोस्</p>
-
+    
     <div class="input-group">
         <input type="text" id="licenseInput" placeholder="उदा: 01-06-00828571" onkeypress="if(event.key === 'Enter') searchLicense()">
     </div>
     
     <button onclick="searchLicense()"><i class="fas fa-search"></i> खोज्नुहोस्</button>
 
-    <div id="loader"><i class="fas fa-spinner fa-spin"></i> प्रणालीले खोज्दैछ...</div>
+    <div id="loader"><i class="fas fa-spinner fa-spin"></i> खोज्दैछ...</div>
     <div id="result" class="result-card"></div>
 </div>
 
 <script>
-    // तपाईंको आफ्नै Supabase विवरणहरू यहाँ सेट गरिएको छ
+    // तपाइँको विवरण यहाँ ठ्याक्कै मिलाएर राखिएको छ
     const SUPABASE_URL = 'https://bjnpdbfnzzfuwqsarldo.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_fEyF1cfrtllCnw5q-CfvbA_mP0PAUpg';
     
-    // Supabase Client सुरु गर्ने
+    // Client initialization
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     async function searchLicense() {
-        const inputField = document.getElementById('licenseInput');
-        const input = inputField.value.trim();
+        const input = document.getElementById('licenseInput').value.trim();
         const resultDiv = document.getElementById('result');
         const loader = document.getElementById('loader');
 
-        // खाली इनपुट जाँच
         if (!input) {
             alert("कृपया लाइसेन्स नम्बर राख्नुहोस्।");
             return;
         }
 
-        // डिस्प्ले सफा गर्ने र लोडर देखाउने
         resultDiv.style.display = 'none';
         loader.style.display = 'block';
 
         try {
-            // सुरक्षित तरिकाले डेटाबेसको RPC फङ्सन कल गर्ने
+            // SECURE RPC CALL
             const { data, error } = await supabaseClient
                 .rpc('search_license_secure', { input_num: input });
 
             loader.style.display = 'none';
 
-            if (error) {
-                console.error("Database Error:", error);
-                throw error;
-            }
+            if (error) throw error;
 
             if (data && data.length > 0) {
                 resultDiv.className = 'result-card success';
-                let html = `<h3 style="margin-top:0; color:#16a34a;"><i class="fas fa-check-circle"></i> रेकर्ड भेटियो!</h3>`;
-                
-                // फेला परेका सबै रेकर्डहरू देखाउने (यदि एउटै नम्बरमा धेरै कार्ड भएमा)
+                let html = `<h3 style="margin:0 0 10px 0; color:#16a34a;">रेकर्ड भेटियो!</h3>`;
                 data.forEach(item => {
                     html += `
                         <div class="label">चालकको नाम:</div>
                         <div class="value">${item['License Holder Name']}</div>
-                        
                         <div class="label">लाइसेन्स नम्बर:</div>
                         <div class="value">${item['License Number']}</div>
-                        
-                        <div class="label">वर्ग (Category):</div>
-                        <div class="value">${item['Category'] || 'N/A'}</div>
-                        
-                        <div style="background:#16a34a; color:white; padding:12px; border-radius:8px; margin-top:10px; text-align:center; font-size: 1.1rem;">
+                        <div style="background:#16a34a; color:white; padding:10px; border-radius:5px; margin-top:10px; text-align:center;">
                             <strong>बाकस कोड नम्बर: ${item['Box Code']}</strong>
                         </div>
-                        <hr style="border:0; border-top:1px solid #dcfce7; margin: 20px 0;">
+                        <hr style="margin:15px 0; border:0; border-top:1px solid #16a34a;">
                     `;
                 });
                 resultDiv.innerHTML = html;
             } else {
-                // रेकर्ड नभेटिएमा
                 resultDiv.className = 'result-card error';
-                resultDiv.innerHTML = `<h3 style="margin-top:0; color:#dc2626;"><i class="fas fa-times-circle"></i> भेटिएन!</h3>
-                <p>माफ गर्नुहोला, यो नम्बरको लाइसेन्स हाम्रो कार्यालयमा प्राप्त भएको छैन। कृपया केही दिनपछि पुन: प्रयास गर्नुहोला।</p>`;
+                resultDiv.innerHTML = `<h3 style="margin:0; color:#dc2626;">भेटिएन!</h3>
+                <p>यो नम्बरको लाइसेन्स प्राप्त भएको छैन।</p>`;
             }
             resultDiv.style.display = 'block';
 
         } catch (err) {
             loader.style.display = 'none';
-            console.error("Critical Error:", err);
-            alert("प्रणालीमा समस्या आयो। कृपया पुन: प्रयास गर्नुहोस् वा इन्टरनेट जडान जाँच गर्नुहोस्।");
+            console.error(err);
+            alert("प्रणालीमा समस्या आयो। कृपया URL र Key चेक गर्नुहोस्।");
         }
     }
 </script>
+
 </body>
 </html>
