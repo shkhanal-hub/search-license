@@ -33,7 +33,7 @@
             background: var(--info-blue-bg); 
             padding: 14px; 
             border-radius: 8px; 
-            margin-top: 20px; /* बटन भन्दा मुनी खाली ठाउँ राख्न */
+            margin-top: 20px; 
             margin-bottom: 20px; 
             line-height: 1.6; 
             border-left: 5px solid var(--info-blue-border); 
@@ -126,7 +126,12 @@
     
     <button id="searchBtn" onclick="searchLicense()"><i class="fas fa-search"></i> खोज्नुहोस्</button>
 
-    <!-- बटन भन्दा मुनी सारिएको र थप बुँदाहरू समावेश गरिएको निलो रंगको बक्स -->
+    <div id="loader"><i class="fas fa-spinner fa-spin"></i> खोज्दैछ, कृपया पर्खनुहोस्...</div>
+    
+    <!-- विवरण खोज्नुहोस् बटनको मुनी र Information Box भन्दा माथि सारिएको नतिजा कार्ड (Result Card) -->
+    <div id="result" class="result-card"></div>
+
+    <!-- बटन र नतिजा कार्ड भन्दा मुनी रहेको निलो रंगको इन्फो बक्स -->
     <div class="info-text">
         <i class="fas fa-info-circle"></i> यो पेजबाट <strong>यातायात व्यवस्था कार्यालय, कलंकी (ठूलो भर्याङ)</strong> मा राजश्व बुझाउनु भएको लाइसेन्सहरू मात्र खोज्न सकिन्छ ।
         <br/><br/>
@@ -136,9 +141,6 @@
             <li>दैनिक तर्फका <strong>१५ अप्रिल २०२६ (२ वैशाख २०८३)</strong> पछिका कार्यालयले सूचनामा उल्लेख गरेका मिति सम्मका लाइसेन्सहरू।</li>
         </ul>
     </div>
-
-    <div id="loader"><i class="fas fa-spinner fa-spin"></i> खोज्दैछ, कृपया पर्खनुहोस्...</div>
-    <div id="result" class="result-card"></div>
 </div>
 
 <script>
