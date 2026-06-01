@@ -15,7 +15,7 @@
             --highlight-bg: #f0fdf4;
             --highlight-text: #166534;
             
-            /* निलो रंगको बक्सका लागि नयाँ भ्यारियबलहरू */
+            /* निलो रंगको इन्फो बक्सका लागि आवश्यक भ्यारियबलहरू */
             --info-blue-bg: #eff6ff;
             --info-blue-border: #2563eb;
             --info-blue-text: #1e3a8a;
@@ -26,13 +26,14 @@
         
         h2 { color: #333; margin: 15px 0 5px 0; font-size: 1.4rem; font-weight: bold; }
         
-        /* रातोबाट निलो रंगमा परिवर्तन गरिएको इन्फो बक्स स्टाइल */
+        /* नयाँ निलो रंगको इन्फो बक्स स्टाइल */
         .info-text { 
             font-size: 0.88rem; 
             color: var(--info-blue-text); 
             background: var(--info-blue-bg); 
             padding: 14px; 
             border-radius: 8px; 
+            margin-top: 20px; /* बटन भन्दा मुनी खाली ठाउँ राख्न */
             margin-bottom: 20px; 
             line-height: 1.6; 
             border-left: 5px solid var(--info-blue-border); 
@@ -118,22 +119,23 @@
     
     <h2>सवारी चालक अनुमति-पत्र खोज्नुहोस्</h2>
     
-    <div class="info-text">
-        <i class="fas fa-info-circle"></i> यो पेजबाट <strong>यातायात व्यवस्था कार्यालय, कलंकी (ठूलो भर्याङ)</strong> मा राजश्व बुझाउनु भएको लाइसेन्सहरू मात्र खोज्न सकिन्छ । 
-        <br/><br/>
-        <strong>यस प्रणालीबाट देहायका लाइसेन्सहरू खोज्न मिल्छ:</strong>
-        <ul>
-            <li>नियमित तर्फका पहिलो लटको <a href="https://tmokalanki.bagamati.gov.np/content/10/40267-licenses-received/" target="_blank">४०,२६७ वटा लाइसेन्सहरू</a>।</li>
-            <li>दैनिक तर्फका <strong>१५ अप्रिल २०२६ (२ वैशाख २०८३)</strong> पछिका कार्यालयले सूचनामा उल्लेख गरेका मिति सम्मका लाइसेन्सहरू।</li>
-        </ul>
-    </div>
-
     <div class="input-group">
         <input type="text" id="licenseInput" placeholder="लाइसेन्स नम्बर राख्नुहोस् (उदा: 01-06-00828571)" autocomplete="off">
         <i class="fas fa-times-circle clear-btn" id="clearInput"></i>
     </div>
     
     <button id="searchBtn" onclick="searchLicense()"><i class="fas fa-search"></i> खोज्नुहोस्</button>
+
+    <!-- बटन भन्दा मुनी सारिएको र थप बुँदाहरू समावेश गरिएको निलो रंगको बक्स -->
+    <div class="info-text">
+        <i class="fas fa-info-circle"></i> यो पेजबाट <strong>यातायात व्यवस्था कार्यालय, कलंकी (ठूलो भर्याङ)</strong> मा राजश्व बुझाउनु भएको लाइसेन्सहरू मात्र खोज्न सकिन्छ ।
+        <br/><br/>
+        <strong>यो सर्चबाट देहायका लाइसेन्सहरू सर्च गर्न मिल्छ:</strong>
+        <ul>
+            <li>नियमित तर्फका पहिलो लटका <a href="https://tmokalanki.bagamati.gov.np/content/10/40267-licenses-received/" target="_blank">४०,२६७ वटा लाइसेन्सहरू</a>।</li>
+            <li>दैनिक तर्फका <strong>१५ अप्रिल २०२६ (२ वैशाख २०८३)</strong> पछिका कार्यालयले सूचनामा उल्लेख गरेका मिति सम्मका लाइसेन्सहरू।</li>
+        </ul>
+    </div>
 
     <div id="loader"><i class="fas fa-spinner fa-spin"></i> खोज्दैछ, कृपया पर्खनुहोस्...</div>
     <div id="result" class="result-card"></div>
@@ -150,18 +152,15 @@
     const loader = document.getElementById('loader');
     const searchBtn = document.getElementById('searchBtn');
 
-    // इनपुट फिल्ड क्लिक हुँदा पुरानो नतिजा लुकाउने
     inputField.addEventListener('click', () => {
         resultDiv.style.display = 'none';
         resultDiv.innerHTML = '';
     });
 
-    // टाइप गर्दा क्लियर बटन नियन्त्रण गर्ने
     inputField.addEventListener('input', () => {
         clearBtn.style.display = inputField.value ? 'block' : 'none';
     });
 
-    // क्लियर बटन थिच्दा इनपुट सफा गर्ने
     clearBtn.addEventListener('click', () => {
         inputField.value = '';
         clearBtn.style.display = 'none';
@@ -173,7 +172,6 @@
         if (e.key === 'Enter') searchLicense();
     });
 
-    // फ्रन्टइन्ड इनपुट भ्यालिडेसन (सुरक्षा सुदृढीकरण)
     function sanitizeInput(str) {
         return str.replace(/[^a-zA-Z0-9-]/g, '').trim();
     }
@@ -205,7 +203,7 @@
 
             if (data && data.length > 0) {
                 resultDiv.className = 'result-card success';
-                let html = `<h3 style="margin-top:0; color:var(--success); text-align:center;">रेकرد भेटियो!</h3><p align="center">कार्यालयको १४ नं काउण्टरबाट लाइसेन्स संकलन गर्नुहोला।</p>`;
+                let html = `<h3 style="margin-top:0; color:var(--success); text-align:center;">रेकर्ड भेटियो!</h3><p align="center">कार्यालयको १४ नं काउण्टरबाट लाइसेन्स संकलन गर्नुहोला।</p>`;
                 
                 data.forEach((item) => {
                     html += `
