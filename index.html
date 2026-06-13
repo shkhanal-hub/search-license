@@ -58,6 +58,12 @@
             margin-bottom: 4px;
         }
         
+        /* सर्च सेक्सनलाई कम चौडा र सजिलै देखिने बनाउन थपिएको स्टाइल */
+        .search-section {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
         .input-group { margin-bottom: 1rem; position: relative; }
         input { width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; box-sizing: border-box; outline: none; }
         input:focus { border-color: var(--primary); }
@@ -80,7 +86,7 @@
         .result-card { margin-top: 20px; padding: 15px; border-radius: 10px; text-align: left; display: none; }
         .success { background: #f0fdf4; border: 1px solid var(--success); }
         .error { background: #fef2f2; border: 1px solid var(--error); }
-        .label { font-weight: bold; color: #64748b; font-size: 0.8rem; margin-bottom: 2px; }
+        .label { font-weight: bold; color: #64748b; font-size: 0.82rem; margin-bottom: 2px; }
         .value { color: #1e293b; margin-bottom: 12px; font-size: 1.05rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; }
         
         .box-highlight { 
@@ -96,7 +102,7 @@
 
         .box-highlight strong {
             display: block;
-            font-size: 0.85rem;
+            font-size: 0.88rem;
             color: #15803d;
             margin-bottom: 5px;
             text-transform: uppercase;
@@ -119,19 +125,19 @@
     
     <h2>सवारी चालक अनुमति-पत्र खोज्नुहोस्</h2>
     
-    <div class="input-group">
-        <input type="text" id="licenseInput" placeholder="लाइसेन्स नम्बर राख्नुहोस् (उदा: 01-06-00828571)" autocomplete="off">
-        <i class="fas fa-times-circle clear-btn" id="clearInput"></i>
+    <div class="search-section">
+        <div class="input-group">
+            <input type="text" id="licenseInput" placeholder="लाइसेन्स नम्बर राख्नुहोस् (उदा: 01-06-00828571)" autocomplete="off">
+            <i class="fas fa-times-circle clear-btn" id="clearInput"></i>
+        </div>
+        
+        <button id="searchBtn" onclick="searchLicense()"><i class="fas fa-search"></i> खोज्नुहोस्</button>
     </div>
-    
-    <button id="searchBtn" onclick="searchLicense()"><i class="fas fa-search"></i> खोज्नुहोस्</button>
 
     <div id="loader"><i class="fas fa-spinner fa-spin"></i> खोज्दैछ, कृपया पर्खनुहोस्...</div>
     
-    <!-- विवरण खोज्नुहोस् बटनको मुनी र Information Box भन्दा माथि सारिएको नतिजा कार्ड (Result Card) -->
     <div id="result" class="result-card"></div>
 
-    <!-- बटन र नतिजा कार्ड भन्दा मुनी रहेको निलो रंगको इन्फो बक्स -->
     <div class="info-text">
         <i class="fas fa-info-circle"></i> यो पेजबाट <strong>यातायात व्यवस्था कार्यालय, कलंकी (ठूलो भर्याङ)</strong> मा राजश्व बुझाउनु भएको लाइसेन्सहरू मात्र खोज्न सकिन्छ ।
         <br/><br/>
@@ -205,20 +211,22 @@
 
             if (data && data.length > 0) {
                 resultDiv.className = 'result-card success';
-                let html = `<h3 style="margin-top:0; color:var(--success); text-align:center;">रेकर्ड भेटियो!</h3><p align="center">कार्यालयको १४ नं काउण्टरबाट लाइसेन्स संकलन गर्नुहोला।</p>`;
+                let html = `<h3 style="margin-top:0; color:var(--success); text-align:center;">रेकर्ड भेटियो! (Record Found!)</h3><p align="center">कार्यालयको १४ नं काउण्टरबाट लाइसेन्स संकलन गर्नुहोला।<br><span style="font-size:0.9rem; color:#555;">(Please collect your license from Counter No. 14)</span></p>`;
                 
                 data.forEach((item) => {
                     html += `
                         <div style="background: white; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #dcfce7;">
-                            <div class="label">चालकको नाम:</div>
+                            <div class="label">चालकको नाम / License Holder Name:</div>
                             <div class="value">${item['License Holder Name'] || 'N/A'}</div>
-                            <div class="label">लाइसेन्स नम्बर:</div>
+                            
+                            <div class="label">लाइसेन्स नम्बर / License Number:</div>
                             <div class="value">${item['License Number'] || 'N/A'}</div>
-                            <div class="label">वर्ग (Category):</div>
+                            
+                            <div class="label">वर्ग / Category:</div>
                             <div class="value">${item['Category'] || 'N/A'}</div>
                             
                             <div class="box-highlight">
-                                <strong>बाकस कोड नम्बर</strong>
+                                <strong>बाकस कोड नम्बर / Box Code</strong>
                                 <div class="box-code-value">${item['Box Code'] || 'N/A'}</div>
                             </div>
                         </div>
@@ -229,10 +237,14 @@
                 resultDiv.className = 'result-card error';
                 resultDiv.innerHTML = `
                     <div style="text-align: center;">
-                        <h3 style="margin-top:0; color:var(--error);">भेटिएन!</h3>
-                        <p style="color: #444; line-height: 1.6;">
+                        <h3 style="margin-top:0; color:var(--error);">भेटिएन! (Not Found!)</h3>
+                        <p style="color: #444; line-height: 1.6; font-size:0.95rem;">
                             कार्यालयको अभिलेख अनुसार तपाईँको लाइसेन्स कार्यालयमा प्राप्त भएको देखिएन । 
                             कार्यालयले आफ्नो वेवसाईटमा सूचना प्रकाशन गरेपछि पुनः खोजी गर्नुहोला ।
+                        </p>
+                        <p style="color: #666; line-height: 1.6; font-size:0.88rem; border-top:1px dashed #fca5a5; padding-top:8px; margin-top:8px;">
+                            According to the official records, your license has not been received yet. 
+                            Please search again after the office publishes a new notice on the website.
                         </p>
                     </div>`;
             }
